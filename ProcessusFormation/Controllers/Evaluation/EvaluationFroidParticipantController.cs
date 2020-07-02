@@ -180,10 +180,10 @@ namespace ProcessusFormation.Controllers.Evaluation
                 }
             }
 
-            for (int k = 0; k < List.Count; k++)
-            {  
-                return List[k];
-            }
+         //   for (int k = 0; k < List.Count; k++)
+          //  {  
+                return List;
+        //    }
                
         }
     }
