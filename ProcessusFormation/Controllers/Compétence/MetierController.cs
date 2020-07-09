@@ -165,6 +165,13 @@ namespace ProcessusFormation.Controllers.Compétence
             public static int Niveau=0;
           //  public static string UserName = "";
         };
+        public static class Userobj
+        {
+            public static int labelId = 0;
+            public static int Niveau = 0;
+            public static string UserId = "";
+        };
+
         [HttpGet]
         [Route("Getuser/{id}")]
         public async Task<Object> Getuser(string id)
@@ -174,6 +181,7 @@ namespace ProcessusFormation.Controllers.Compétence
 
 
         }
+        //cette fonction doit retourner tout les laId et Niveau de user selecté
         [HttpGet]
         [Route("GetuserSelected/{id}")]
         public  IEnumerable<Object> GetuserSelected(string id)
@@ -190,7 +198,7 @@ namespace ProcessusFormation.Controllers.Compétence
                 {
                     obj.labelId = element.LabelId;
                     obj.Niveau = element.Niveau;
-                //   obj.UserName = user.UserName + user.FullName;
+                 //   obj.UserName = user.UserName + user.FullName;
                     List.Add(new{ obj.labelId,obj.Niveau});
 
                 }
@@ -199,9 +207,222 @@ namespace ProcessusFormation.Controllers.Compétence
 
                  return List;
            
-        }     
+        }
 
-    }
+        //get label and niveau par domaine d'activité
+        int dom = 0;
+        [HttpGet]
+        [Route("GetuserDomaine/{id}")]
+        public IEnumerable<Object> GetuserDomaine(string id)
+        {
+            
+            var metiers = _context.Metiers;
+            var domaine = _context.Domaines;
+         //   var user = _userManager.FindByIdAsync(id);
+            List<Object> List = new List<Object>();
+            //  var user =  _userManager.FindByIdAsync(id);
+            //  var  user = _userManager.FindByIdAsync(id);
+            foreach (var element in metiers)
+            {
+                if (element.UserId == id) //&& element.LabelId == model.LabelId
+                {
+                    dom = element.DomaineId;
+
+
+                }
+            };
+            foreach (var element in metiers)
+            {
+                if (element.DomaineId == dom) //&& element.LabelId == model.LabelId
+                {
+                    List.Add(element);
+
+                }
+            };
+
+
+           return List;
+
+        }
+
+        //get users par domaine d'activité
+        int domanie;
+        [HttpGet]
+        [Route("GetusersByDomaine/{id}")]
+        public IEnumerable<Object> GetusersByDomaine(string id)
+        {
+            List<String> List = new List<String>();
+          //  var user = await _userManager.FindByIdAsync(id);
+            var metiers = _context.Metiers;
+            var users = _userManager.Users;
+            //  return user;
+          //  List<Object> ListUser = new List<Object>();
+            foreach (var element in metiers)
+            {
+                if (element.UserId == id) //&& element.LabelId == model.LabelId
+                {
+                    domanie = element.DomaineId;
+
+
+                }
+            };
+            foreach (var element in metiers)
+            {
+                if (element.DomaineId == domanie) //&& element.LabelId == model.LabelId
+                { 
+                  //  userId.Id = element.UserId;
+
+                    List.Add(element.UserId);
+               //     yield return element;
+
+                }
+            };
+
+          //   return List;
+
+
+
+            foreach (var ele in users)
+            {
+              //  yield return ele;
+                for (int j = 0; j < List.Count; j++)
+                {
+                    if (ele.Id == List[j])
+                    {
+                        yield return ele;
+                    }
+                }
+            }
+           
+          }
+        //ici bech nraja3 tout les labelId UserID et niveau de chacun
+        int DomaineDA;
+        [HttpGet]
+        [Route("GetUserDetail/{id}")]
+        public IEnumerable<Object> GetUserDetail(string id)
+        {
+
+            var metiers = _context.Metiers;
+
+            List<Object> List = new List<Object>();
+            //  var user =  _userManager.FindByIdAsync(id);
+            //  var  user = _userManager.FindByIdAsync(id);
+            foreach (var element in metiers)
+            {
+                if (element.UserId == id) //&& element.LabelId == model.LabelId
+                {
+                    DomaineDA = element.DomaineId;
+                
+
+                }
+            };
+
+            foreach (var element in metiers)
+            {
+                if (element.UserId == id) //&& element.LabelId == model.LabelId
+                {
+                    DomaineDA = element.DomaineId;
+                    Userobj.labelId = element.LabelId;
+                    Userobj.Niveau = element.Niveau;
+                    Userobj.UserId = element.UserId;
+                    //   obj.UserName = user.UserName + user.FullName;
+                    List.Add(new { Userobj.labelId, Userobj.Niveau, Userobj.UserId });
+
+                }
+            };
+
+
+
+            return List;
+
+        }
+        // je recuppere les label par Domaine delon directeur activité
+        int DomaineSelecté;
+        [HttpGet]
+        [Route("GetLabelDA/{id}")]
+        public IEnumerable<Object> GetLabelDA(string id)
+        {
+            List<int> ListId = new List<int>();
+            List<LabelModel> List = new List<LabelModel>();
+            var metiers = _context.Metiers;
+            var labels = _context.Labels;
+            if (metiers == null)
+            {
+                yield return (null);
+            }
+            // je doit recuperer dans une liste tout les labelId qui correspond à l'utilisateur element.UserId == model.UserId
+            foreach (var element in metiers)
+            {
+                if (element.UserId == id) //&& element.LabelId == model.LabelId
+                {
+                    DomaineSelecté = element.DomaineId;
+                  
+
+                };
+            }
+            foreach (var element in metiers)
+            {
+                if (element.DomaineId == DomaineSelecté) //&& element.LabelId == model.LabelId
+                {
+                  
+                    ListId.Add(element.LabelId);
+                   
+
+                };
+            }
+            //ici il faut retourner la liste de label qui correspant au utilisateur d'id element.UserId == model.UserId
+
+            for (int j = 0; j < ListId.Count; j++)
+            {
+                foreach (var label in labels)
+                {
+                    if (ListId[j] == label.LabelId)
+                    {
+                        List.Add(label);
+                        //  return eval;
+                    }
+
+                }
+            }
+            for (int j = 0; j < List.Count; j++)
+            {
+                yield return List[j];
+            }
+        }
+        int DomaineDir=0;
+        [HttpGet]
+        [Route("GetDirecteurActiviteDomaine/{id}")]
+        public IEnumerable<Object> GetDomanie(string id)
+        {
+            var metiers = _context.Metiers;
+            var Domaine = _context.Domaines;
+            foreach (var element in metiers)
+            {
+                if (element.UserId == id) //&& element.LabelId == model.LabelId
+                {
+                    DomaineDir = element.DomaineId;
+
+
+                };
+            }
+            foreach (var element in Domaine)
+            {
+
+                if (element.DomaineId == DomaineDir) //&& element.LabelId == model.LabelId
+                {
+                   yield return element;
+
+
+                };
+            }
+                
+        }
+
+
+
+
+
+        }
 }     
         
 
